@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Document</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.7.2/cropper.min.css">
+		<style>
+			/* Limit image width to avoid overflow the container */
+			
+			.container {
+				width: 500px;
+				margin: 0 auto;
+			}
+			
+			.crop-image {
+				display: flex;
+				align-items: stretch;
+			}
+			
+			.img-container {
+				width: 200px;
+				height: 250px;
+			}
+			
+			.img-container>img {
+				width: 200px;
+				height: 250px;
+			}
+			
+			#drop_area {
+				width: 0px;
+				flex-grow: 1;
+				border: 3px dashed silver;
+				line-height: 250px;
+				text-align: center;
+				font-size: 20px;
+				color: #d3d3d3;
+			}
+			
+			.color-board {
+				display: flex;
+				height: 20px;
+				width: 100%;
+				margin: 10px 0;
+			}
+			
+			.color-block {
+				flex: 1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="app" class="container">
+
+			<div class="crop-image">
+				<div id="drop_area">将图片拖拽到此区域</div>
+				<div class="img-container">
+					<img alt="" id="image">
+				</div>
+			</div>
+			<div class="color-board">
+			</div>
+			<div style="margin: 10px 0">
+				<input v-model="title" placeholder="title" value="聊聊四个基础的">
+				<input v-model="subTitle" placeholder="subtitle" value="设计UI原则">
+				<button @click="draw">draw</button>
+				<a href="#" @click="download" id="download_button">download</a>
+			</div>
+			<canvas id="mycanvas" width="800" height="1000">
+    </canvas>
+		</div>
+		<script src="//cdn.bootcss.com/vibrant.js/1.0.0/Vibrant.js"></script>
+		<script src="https://npmcdn.com/vue@1.0.26/dist/vue.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.7.2/cropper.min.js"></script>
+		<script type="text/javascript">
+			var vm = new Vue({
+				el: '#app',
+				data: {
+					title: '',
+					subTitle: '',
+					currentSrc:'',
+					swatches: null,
+					cropper: null,
+				},
+				ready: function() {
+					var img = document.getElementById('image');
+					var that = this;
+					img.addEventListener('load', function() {
+						that.initVibrant();
+					});
+					that.cropper = new Cropper(image, {
+						viewMode: 0,
+						dragMode: 'move',
+						aspectRatio: 4 / 5,
+						cropBoxMovable: false,
+						cropBoxResizable: false,
+						autoCropArea: 1,
+						crop: function(e) {
+							console.log(e.detail.x);
+							console.log(e.detail.y);
+							console.log(e.detail.width);
+							console.log(e.detail.height);
+							console.log(e.detail.rotate);
+							console.log(e.detail.scaleX);
+							console.log(e.detail.scaleY);
+						}
+					});
+					
+					var box = document.getElementById('drop_area'); //拖拽区域
+					box.addEventListener('dragover', function(e) {
+						e.preventDefault();
+					}, false);
+					box.addEventListener("drop", function(e) {
+						e.preventDefault(); //取消默认浏览器拖拽效果
+						var fileList = e.dataTransfer.files;
+						if (fileList.length == 0) {
+							return false;
+						}
+						//检测文件是不是图片
+						if (fileList[0].type.indexOf('image') === -1) {
+							alert("您拖的不是图片！");
+							return false;
+						}
+						//拖拉图片到浏览器，可以实现预览功能
+						var img = window.URL.createObjectURL(fileList[0]);
+						var image = document.getElementById('image');
+						image.src = img;
+					}, false);
+					/*
+					 * Results into:
+					 * Vibrant #7a4426
+					 * Muted #7b9eae
+					 * DarkVibrant #348945
+					 * DarkMuted #141414
+					 * LightVibrant #f3ccb4
+					 */
+				},
+				methods: {
+					download: function() {
+						var canvas = document.getElementById("mycanvas");
+						var dataURL = canvas.toDataURL("image/png");
+						var downloadButton = document.getElementById('download_button');
+						dataURL = dataURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
+						/* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
+						dataURL = dataURL.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png');
+						downloadButton.href = dataURL;
+
+					},
+					initVibrant: function() {
+						var img = document.getElementById('image');
+						var vibrant = new Vibrant(img);
+						var swatches = vibrant.swatches();
+						this.swatches = swatches;
+						var colorBoard = document.getElementsByClassName('color-board')[0];
+						colorBoard.innerHTML = '';
+						for (var swatch in swatches) {
+							if (swatches.hasOwnProperty(swatch) && swatches[swatch]) {
+								console.log(swatch, swatches[swatch].getHex())
+								var colorBlock = document.createElement('div');
+								colorBlock.className = 'color-block';
+								colorBlock.style.backgroundColor = swatches[swatch].getHex();
+								colorBoard.appendChild(colorBlock);
+							}
+						}
+						if(this.currentSrc === img.src){
+							return;
+						}
+						this.currentSrc = img.src;
+						this.cropper.replace(img.src);
+					},
+					draw: function() {
+						var img = document.getElementById('image');
+						var swatches = this.swatches;
+						if (!swatches) {
+							alert("正在提取颜色,稍后再试...");
+							return;
+						}
+						var offset = 0;
+						var canvas = document.getElementById('mycanvas');
+						var ctx = canvas.getContext("2d");
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						var baseLine = 0;
+
+						/** draw a banner image */
+						// background
+						var bannerWidth = 500;
+						var bannerHeight = 166;
+
+						ctx.fillStyle = swatches['LightVibrant'].getHex();
+						ctx.fillRect(0, baseLine, bannerWidth, bannerHeight);
+
+						// image
+						ctx.drawImage(this.cropper.getCroppedCanvas(), 0, baseLine, bannerHeight * 4 / 5, bannerHeight);
+
+						// text
+						ctx.fillStyle = swatches['DarkVibrant'].getHex();
+						var title = this.title;
+						var subTitle = this.subTitle;
+
+						var textWidth = bannerWidth * 0.58;
+
+						var subSize = this.fitTextOnCanvas(ctx, subTitle, "黑体", textWidth);
+						var size = this.fitTextOnCanvas(ctx, title, "黑体", textWidth);
+
+						var gap = 5; // gap of title and subtitle
+						var y1 = (bannerHeight - (subSize + size)) / 2 - gap;
+						ctx.fillText(title, 180, baseLine + y1 + size);
+						this.fitTextOnCanvas(ctx, subTitle, "黑体", textWidth);
+						ctx.fontWeight = 'bold';
+						ctx.fillText(subTitle, 180, baseLine + y1 + size + subSize);
+
+					},
+					fitTextOnCanvas: function(context, text, fontface, distWith) {
+						// start with a large font size
+						var fontsize = 300;
+						// lower the font size until the text fits the canvas
+						do {
+							fontsize--;
+							context.font = fontsize + "px " + fontface;
+						} while (context.measureText(text).width > distWith)
+						return fontsize;
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>
