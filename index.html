@@ -20,22 +20,22 @@
 		</div>
 		
 		</div>
-		<div style="margin: 10px 0">
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+		<div class="input">
+			<div class="text mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" v-model="title" type="text" id="title" value="帮你大幅度节省时间的">
 				<label class="mdl-textfield__label" for="title">title</label>
 			</div>
-			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+			<div class="text mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 				<input class="mdl-textfield__input" v-model="subTitle" type="text" id="subTitle" value="四个设计利器">
 				<label class="mdl-textfield__label" for="subTitle">subTitle</label>
 			</div>
 			<div>
-				<button @click="draw" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">draw</button>
+				<button @click="draw" class="mdl-button mdl-js-button  mdl-button--raised mdl-button--colored">draw</button>
 				<a href="#" id="download" @click="download" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">download</a>
 			</div>
 		</div>
 		<div class="output">
-			<canvas id="mycanvas" width="500" height="166"></canvas>
+			<canvas id="mycanvas" width="800" height="267"></canvas>
 		</div>
 	</div>
 	<script src="http://cdn.bootcss.com/vibrant.js/1.0.0/Vibrant.js"></script>

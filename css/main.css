@@ -20,7 +20,7 @@ html, body {
 }
 .output{
 	border-top: 4px solid #f0f0f0;
-	padding: 10px 0;
+	padding-top: 10px;
 }
 .crop-image {
 	display: flex;
@@ -33,8 +33,17 @@ html, body {
 }
 
 .img-container>img {
-	width: 200px;
+	width: 300px;
 	height: 250px;
+}
+
+.input{
+	margin: 10px 0;
+	display: flex;
+}
+.text{
+	width: 200px;
+	margin-right: 20px;
 }
 
 #drop_area {
@@ -47,7 +56,7 @@ html, body {
 	color: #d3d3d3;
 	position: relative;
 	align-items: center;
-    justify-content: center;
+    justify-content: center;	
 }
 
 .color-board {

@@ -10,10 +10,15 @@ var vm = new Vue({
 		textColor: '#000000',
 		cropper: null,
 	},
-	ready: function() {
+	ready: function () {
+
+		var canvas = document.getElementById('mycanvas');
+		this.bannerWidth = canvas.width;
+		this.bannerHeight = canvas.height;
+
 		var img = document.getElementById('image');
 		var that = this;
-		img.addEventListener('load', function() {
+		img.addEventListener('load', function () {
 			that.initVibrant();
 		});
 		that.cropper = new Cropper(image, {
@@ -23,7 +28,7 @@ var vm = new Vue({
 			cropBoxMovable: false,
 			cropBoxResizable: false,
 			autoCropArea: 1,
-			crop: function(e) {
+			crop: function (e) {
 				/*console.log(e.detail.x);
 				console.log(e.detail.y);
 				console.log(e.detail.width);
@@ -34,18 +39,20 @@ var vm = new Vue({
 			}
 		});
 
-		var box = document.getElementById('drop_area'); //拖拽区域
-		box.addEventListener('dragover', function(e) {
+
+		//拖拽区域
+		var box = document.getElementById('drop_area');
+		box.addEventListener('dragover', function (e) {
 			e.preventDefault();
 		}, false);
-		box.addEventListener("drop", function(e) {
+		box.addEventListener("drop", function (e) {
 			e.preventDefault(); //取消默认浏览器拖拽效果
 			var fileList = e.dataTransfer.files;
-			if(fileList.length == 0) {
+			if (fileList.length == 0) {
 				return false;
 			}
 			//检测文件是不是图片
-			if(fileList[0].type.indexOf('image') === -1) {
+			if (fileList[0].type.indexOf('image') === -1) {
 				alert("您拖的不是图片！");
 				return false;
 			}
@@ -75,7 +82,7 @@ var vm = new Vue({
 		 */
 	},
 	methods: {
-		download: function() {
+		download: function () {
 			var canvas = document.getElementById("mycanvas");
 			var dataURL = canvas.toDataURL("image/png");
 			var downloadButton = document.getElementById('download');
@@ -85,7 +92,7 @@ var vm = new Vue({
 			downloadButton.href = dataURL;
 
 		},
-		initVibrant: function() {
+		initVibrant: function () {
 			var img = document.getElementById('image');
 			var vibrant = new Vibrant(img);
 			var swatches = vibrant.swatches();
@@ -93,8 +100,8 @@ var vm = new Vue({
 			this.textColor = swatches['DarkVibrant'].getHex();
 			var colorBoard = document.getElementsByClassName('color-board')[0];
 			colorBoard.innerHTML = '';
-			for(var swatch in swatches) {
-				if(swatches.hasOwnProperty(swatch) && swatches[swatch]) {
+			for (var swatch in swatches) {
+				if (swatches.hasOwnProperty(swatch) && swatches[swatch]) {
 					console.log(swatch, swatches[swatch].getHex())
 					var colorBlock = document.createElement('div');
 					colorBlock.className = 'color-block';
@@ -102,15 +109,15 @@ var vm = new Vue({
 					colorBoard.appendChild(colorBlock);
 				}
 			}
-			if(this.currentSrc === img.src) {
+			if (this.currentSrc === img.src) {
 				return;
 			}
 			this.currentSrc = img.src;
 			this.cropper.replace(img.src);
 		},
-		draw: function() {
+		draw: function () {
 
-			if(!this.cropper){
+			if (!this.cropper) {
 				alert('please upload image!');
 				return;
 			}
@@ -144,12 +151,12 @@ var vm = new Vue({
 
 			var gap = 5; // gap of title and subtitle
 			var y1 = (bannerHeight - (subSize + size)) / 2 - gap;
-			var textX = imageWidth + (bannerWidth-imageWidth-textWidth)/2;
+			var textX = imageWidth + (bannerWidth - imageWidth - textWidth) / 2;
 			ctx.fillText(title, textX, baseLine + y1 + size);
 			this.fitTextOnCanvas(ctx, subTitle, "黑体", textWidth);
 			ctx.fillText(subTitle, textX, baseLine + y1 + size + subSize);
 		},
-		fitTextOnCanvas: function(context, text, fontface, distWith) {
+		fitTextOnCanvas: function (context, text, fontface, distWith) {
 			// start with a large font size
 			var fontsize = 300;
 			// lower the font size until the text fits the canvas
