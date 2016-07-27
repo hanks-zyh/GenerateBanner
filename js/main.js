@@ -78,7 +78,7 @@ var vm = new Vue({
 		download: function() {
 			var canvas = document.getElementById("mycanvas");
 			var dataURL = canvas.toDataURL("image/png");
-			var downloadButton = document.getElementById('download_button');
+			var downloadButton = document.getElementById('download');
 			dataURL = dataURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
 			/* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
 			dataURL = dataURL.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png');
@@ -109,6 +109,11 @@ var vm = new Vue({
 			this.cropper.replace(img.src);
 		},
 		draw: function() {
+
+			if(!this.cropper){
+				alert('please upload image!');
+				return;
+			}
 			var img = document.getElementById('image');
 			var offset = 0;
 			var canvas = document.getElementById('mycanvas');
